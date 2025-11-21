@@ -81,6 +81,7 @@ Se llama muchas veces. Cada llamada realiza **un solo micro-paso** y devuelve un
   ```
 - Al finalizar: `return {"done": True}`
 - Actualizá correctamente los punteros/estado en cada paso.
+- LO QUE NOS COSTO MÁS: 
 
 ---
 
