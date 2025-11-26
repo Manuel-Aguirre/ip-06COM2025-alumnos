@@ -25,7 +25,7 @@ def init(vals):
     temporal = list(vals)
 
     # "ordenada" va a ser la lista temporal pero ordenada usando un mini Insertion Sort.
-    ordenada = list(tmp)
+    ordenada = list(temporal)
 
     # Usamos minis insertion sort para que pueda ordenar temporalmente esta lista.
     # Que hacemos? Ordenar la listra de mayor a menor.
