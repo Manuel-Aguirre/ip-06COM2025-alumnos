@@ -1,118 +1,95 @@
-# Template genérico — SKELETON
 # Contrato: init(vals), step() -> {"a": int, "b": int, "swap": bool, "done": bool}
 
-items = []
-n = 0
-# Agregá acá tus punteros/estado, p.ej.:
-# i = 0; j = 0; fase = "x"; stacks = []
+items = []        # Acá guardamos la lista original que el visualizador va a ordenar.
+n = 0             # Tamaño de la lista.
 
+pasos = []        # Lista donde vamos a guardar todos los intercambios que hay que hacer.
+pos_paso = 0      # En qué paso estamos (un índice dentro de la lista 'pasos').
 
-stacks = []        # Stacks, por donde se guardan las "cosas/elemento" que faltan ordenar.
-izqlimite = 0      # El limite izquierdo del elemento.
-derlimite = 0      # El limite derecho del elemento. 
-i = 0              # Marca donde quedan los numeros menores al corte de referencia.
-j = 0              # Recorre el elemento actual.
-corte_ref = 0      # Posiciona el numero del corte de referencia.
-fase = "nuevo"     # Sacar o particionar el elemento.
 
 def init(vals):
-    global items, n, stacks, izqlimite, derlimite, i, j, corte_ref, fase
+    # La idea principal de Merge, ya que se puede hacer de diversas formas es:
+    # Copiar la lista original para que haga una idea de intercambios para llegar a la lista ordenada.
+    # Esa misma idea de ejecutaría siguiendo una lista de pasos para que Step() solamente la ejecute 1 vez más.
+    global items, n, pasos, pos_paso
+
+    # Copiamos la lista original.
     items = list(vals)
     n = len(items)
-    # Comenzamos marcando un elemento de la lista. Usando .append para marcar el final de la misma.
-    stacks = []
-    if n > 0:
-        stacks.append((0, n - 1))
-    
-    # Volvemos a poner nuestras variables para ajustarlas y comenzarlas a usar en Quick Sort.
 
-    izqlimite = 0
-    derlimite = 0
-    i = 0
-    j = 0
-    corte_ref = 0
-    fase = "nuevo"
+    # Reiniciamos todo para arrancar desde cero, por eso 0.
+    pasos = []
+    pos_paso = 0
+
+    # Hacemos otra copia solo para calcular cómo ordenaríamos la lista, por eso se llama la variable "temporal".
+    temporal = list(vals)
+
+    # "ordenada" va a ser la lista temporal pero ordenada usando un mini Insertion Sort.
+    ordenada = list(temporal)
+
+    # Usamos minis insertion sort para que pueda ordenar temporalmente esta lista.
+    # Que hacemos? Ordenar la listra de mayor a menor.
+    for x in range(1, len(ordenada)):
+        valor = ordenada[x]                 # elemento que vamos a insertar
+        j = x - 1
+
+        # Lo movemos hacia atrás mientras el de atrás sea mayor que "valor".
+        while j >= 0 and ordenada[j] > valor:
+            ordenada[j + 1] = ordenada[j]
+            j -= 1
+
+        # Y colocamos el "valor" en el lugar que corresponde.
+        ordenada[j + 1] = valor
+
+    # Ahora precisamos idear swaps para poder:
+    # Miramos qué valor debería ir ahí en ordenada[i].
+    # Buscamos ese valor en la lista temporal.
+    # Lo vamos trayendo hacia la posición i con swaps cortos (j-1, j).
+    # Cada uno de esos swaps lo guardamos en la lista de "pasos" como explicamos al principio.
+    # Después step() va a ejecutar los swaps.
+
+    for i in range(n):
+
+        # El valor que debería estar en la posición i según la lista ordenada.
+        valorCorrecto = ordenada[i]
+
+        # Buscamos dónde está ese valor dentro del temporal
+        j = i
+        while j < n and temporal[j] != valorCorrecto:
+            j += 1
+
+        # Una vez encontrado, lo traemos desde j hasta i usando swaps cortos.
+        while j > i:
+            # Guardamos el swap necesario, y utilizamos .append para ver el final.
+            pasos.append((j - 1, j))
+
+            # Aplicamos ese swap sobre el temporal y poder seguir calculando bien el resto.
+            temporal[j - 1], temporal[j] = temporal[j], temporal[j - 1]
+
+            # Avanzamos hacia la izquierda.
+            j -= 1
+
+    # Toda esta secuencia de pasos la hicimos gracias a la lista temporal, porque:
+    # Aún no podíamos modificar la lista original ya que necesitamos darle intrucciones previas para que se realice bien.
+    # Ahora sí podemos hacer que steps pueda mover la lista original.
+
 
 def step():
-    global items, n, stacks, izqlimite, derlimite, i, j, corte_ref, fase
-    # Damos una condicion por si no quedan/hay elementos por ordenar.
-    if fase == "nuevo" and not stacks:
+    # El visualizador aplica en la funcion "items" cada vez que lo llama para avisar que hay posiciones moviendose.
+    # Cuando no hayan más pasos que hacer, done = True.
+    global items, n, pasos, pos_paso
+
+    # Si ya ejecutamos todos los pasos, entonces el algoritmo terminó.
+    if pos_paso >= len(pasos):
         return {"a": 0, "b": 0, "swap": False, "done": True}
 
-    # La fase "nuevo" toma un elemento pendiente. Porque recordamos que Quick Sort no ordena todo de una.
-    # Se divide en pedazos chicos, como listas y sus sublistas, ordenandolas uno x uno.
-    if fase == "nuevo":
-        # Obetenemos el ultimo elemento.
-        ultimo = len(stacks) - 1
-        izqlimite, derlimite = stacks[ultimo]
+    # Tomamos el siguiente par de posiciones a intercambiar.
+    a, b = pasos[pos_paso]
+    pos_paso += 1
 
-        # Volvemos a escribir la lista "pendiente" pero sin el ultimo elemento porque ya lo tenemos.
-        pendiente = []
-        for k in range(0, ultimo):          # Osea, todos menos el ultimo.
-            pendiente.append(stacks[k])     # .append final de la lista.
-        stacks = pendiente
+    # Intercambiamos realmente dentro de la lista que se muestra en pantalla.
+    # Esta vez no usamos auxiliar porqué la sobrecarga de procesos hace que el visualizador piense que ya termino cuando se queda en mitad del intercambio de elementos.
+    items[a], items[b] = items[b], items[a]
 
-        # Hacemos uso del corte de referencia.
-        corte_ref = derlimite
-
-        # Hacemos uso de nuestras variables "i" y "j". Que ya arranquen desde toda la izq.
-        i = izqlimite
-        j = izqlimite
-
-        fase = "empezar"
-        return {"a": j, "b": corte_ref, "swap": False, "done": False}
-
-        # La nueva fase empezar va a separar los elementos en grupos:
-        # Los más chicos del numero de referencia.
-        # Los que son más grandes.
-
-    if fase == "empezar":
-        if j < derlimite:   # J no va a llegar al final para seguir comparando elementos.
-            a = j
-            b = corte_ref
-            swap = False
-
-            # Si el elemento es menor al de la referencia va hacía la izquierda.
-            # Utilizamos el mismo metodo que siempre, auxiliares.
-            if items[j] < items[corte_ref]:
-                aux = items[i]
-                items[i] = items[j]
-                items[j] = aux
-
-                # Necesitamos una variable que recopile las mismas, usamos "resultado".
-                resultado = {"a": i, "b": j, "swap": True, "done": False}
-
-                # Que se sigan comparando elementos y que vaya mirando el siguiente, de la forma:
-                i += 1      # Marcamos el limite de los más chicos.
-                j += 1      # Comparamos este elemento, vamos al siguiente.
-                return resultado
-            else:
-                # Como no hay un swap, no hay intercambio de elementos, mostramos en visualizador:
-                # Elementos que se comparan, sin moverse. Es avisarle al mismo lo que pasa en ese paso.
-                resultado = {"a": a, "b": b, "swap": False, "done": False}
-                j += 1
-                return resultado
-        else:
-            # Ultimo intercambio usando corte de referencia.
-            aux = items[i]
-            items[i] = items[corte_ref]
-            items[corte_ref] = aux
-
-            corteNuevo = i
-
-            # Generamos los elementos izquierdos y derechos para agregarlos en pendiente.
-            # Empezamos con el izquierdo, si tiene un elemento mayor a 1.
-            if corteNuevo - 1 > izqlimite:
-                stacks.append((izqlimite, corteNuevo - 1))
-            
-            # Ahora nos toca lo mismo pero con el derecho.
-            if corteNuevo + 1 < derlimite:
-                stacks.append((corteNuevo + 1, derlimite))
-
-            # Quick cuando termina de separar los elementos, independientemente de que sea izq. o der.
-            # Usando el corte de referencia ya queda listo, pero va a necesitar buscar otro elemento pendiente.
-            # Si quedan elementos de la lista sin usarse u ordenarse, hay que:
-            # Agarrar el ultimo, ordenarlo, volverlo a fase "nuevo", agarrar otro, lo ordena y repetidamente el mismo proceso.
-
-            fase = "nuevo"
-            return {"a": i, "b": corte_ref, "swap": True, "done": False}
+    # Avisamos al visualizador que hubo un swap y que seguimos.
+    return {"a": a, "b": b, "swap": True, "done": False}
