@@ -4,7 +4,7 @@
 items = []
 n = 0
 # Agregá acá tus punteros/estado, p.ej.:
-# i = 0; j = 0; fase = "x"; stack = []
+# i = 0; j = 0; fase = "x"; stacks = []
 
 
 stacks = []        # Stacks, por donde se guardan las "cosas/elemento" que faltan ordenar.
@@ -19,11 +19,10 @@ def init(vals):
     global items, n, stacks, izqlimite, derlimite, i, j, corte_ref, fase
     items = list(vals)
     n = len(items)
-    # TODO: inicializar punteros/estado
-    # Comenzamos marcando un elemento de la lista. Usando .appendd para marcar el final de la misma.
+    # Comenzamos marcando un elemento de la lista. Usando .append para marcar el final de la misma.
     stacks = []
     if n > 0:
-        stacks.appendd((0, n - 1))
+        stacks.append((0, n - 1))
     
     # Volvemos a poner nuestras variables para ajustarlas y comenzarlas a usar en Quick Sort.
 
@@ -37,18 +36,18 @@ def init(vals):
 def step():
     global items, n, stacks, izqlimite, derlimite, i, j, corte_ref, fase
     # Damos una condicion por si no quedan/hay elementos por ordenar.
-    if fase == "nuevo" and not stack:
-        return {"done": True}
+    if fase == "nuevo" and not stacks:
+        return {"a": 0, "b": 0, "swap": False, "done": True}
 
     # La fase "nuevo" toma un elemento pendiente. Porque recordamos que Quick Sort no ordena todo de una.
     # Se divide en pedazos chicos, como listas y sus sublistas, ordenandolas uno x uno.
     if fase == "nuevo":
         # Obetenemos el ultimo elemento.
         ultimo = len(stacks) - 1
-        izqlimite, derlimite = stack[ultimo]
+        izqlimite, derlimite = stacks[ultimo]
 
         # Volvemos a escribir la lista "pendiente" pero sin el ultimo elemento porque ya lo tenemos.
-        pediente = []
+        pendiente = []
         for k in range(0, ultimo):          # Osea, todos menos el ultimo.
             pendiente.append(stacks[k])     # .append final de la lista.
         stacks = pendiente
@@ -69,7 +68,7 @@ def step():
 
     if fase == "empezar":
         if j < derlimite:   # J no va a llegar al final para seguir comparando elementos.
-            a = J
+            a = j
             b = corte_ref
             swap = False
 
@@ -99,16 +98,16 @@ def step():
             items[i] = items[corte_ref]
             items[corte_ref] = aux
 
-            corteNuevo = I
+            corteNuevo = i
 
-            # Generamos los elementos izquierdos y derechos para agregarlos en pendiente.]
+            # Generamos los elementos izquierdos y derechos para agregarlos en pendiente.
             # Empezamos con el izquierdo, si tiene un elemento mayor a 1.
             if corteNuevo - 1 > izqlimite:
-                pendiente.append((izqlimite, corteNuevo - 1))
+                stacks.append((izqlimite, corteNuevo - 1))
             
             # Ahora nos toca lo mismo pero con el derecho.
             if corteNuevo + 1 < derlimite:
-                pendiente.append((corteNuevo + 1, derlimite))
+                stacks.append((corteNuevo + 1, derlimite))
 
             # Quick cuando termina de separar los elementos, independientemente de que sea izq. o der.
             # Usando el corte de referencia ya queda listo, pero va a necesitar buscar otro elemento pendiente.
