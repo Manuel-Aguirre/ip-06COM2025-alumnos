@@ -155,12 +155,12 @@ El informe debe estar en **PDF** dentro de la carpeta del TP.
 ---
 
 ## ✅ Checklist antes de entregar
-- [ ] Los 3 algoritmos base están implementados y finalizan correctamente  
-- [ ] `init` resetea el estado  
-- [ ] `step` realiza un micro-paso  
-- [ ] Swaps hechos antes de devolver `swap=True`  
-- [ ] Probado con listas vacías, cortas, ordenadas e inversas  
-- [ ] Informe y README listos  
+- [ ✅ ] Los 3 algoritmos base están implementados y finalizan correctamente  
+- [ ✅ ] `init` resetea el estado  
+- [ ✅ ] `step` realiza un micro-paso  
+- [ ✅ ] Swaps hechos antes de devolver `swap=True`  
+- [ ✅ ] Probado con listas vacías, cortas, ordenadas e inversas  
+- [ ✅ ] Informe y README listos  
 
 ---
 
