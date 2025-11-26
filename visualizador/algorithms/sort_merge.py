@@ -1,4 +1,4 @@
-# Contrato: init(vals), step() -> {"a": int, "b": int, "swap": bool, "done": bool}
+# Contrato: init(vals), step() -> {"a": int, "b": int, "swap": bool, "done": bool} 
 
 items = []        # Acá guardamos la lista original que el visualizador va a ordenar.
 n = 0             # Tamaño de la lista.
